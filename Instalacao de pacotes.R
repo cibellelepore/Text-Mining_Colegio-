@@ -2,7 +2,7 @@
 #                  INSTALAÇÃO E CARREGAMENTO DE PACOTES NECESSÁRIOS             #
 ##################################################################################
 #Pacotes utilizados
-pacotes <- c("tidytext","ggplot2","dplyr","tibble","gutenbergr","wordcloud","stringr","SnowballC","widyr","janeaustenr")
+pacotes <- c("tm","NLP", "quanteda","tidytext","ggplot2","dplyr","tibble","gutenbergr","wordcloud","stringr","SnowballC","widyr","janeaustenr")
 
 if(sum(as.numeric(!pacotes %in% installed.packages())) != 0){
   instalador <- pacotes[!pacotes %in% installed.packages()]
