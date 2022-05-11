@@ -11,73 +11,44 @@ library("tibble")
 library("wordcloud")
 library("stringr")
 library("SnowballC")
-library("quanteda")
-library("tm")
-library("NLP")
 
 
-# Criando um data frame só com os comentários
+usuario_1 <- "Excelente escola em todos os sentidos. Minha filha desenvolveu demais. Sem palavras para o
+acolhimento e o capricho em tudo o que é feito na escola. Ótimos profissionais!"
 
-comentario <- Tabela_de_Comentarios %>% select(Comentário)
+usuario_2 <- "O Colégio Sonho Meu trata seus alunos como mais do que crianças, clientes ou pessoas. Os alunos e suas famílias são os parceiros de um Sonho. Sonho de ensinar com  qualidade, de sermos bem cuidados, de formar pessoas de bom caráter e de trabalho em equipe. Agradeço ao Colégio Sonho Meu pelos oito anos que estamos juntos, nos quais pude confiar a vocês a tarefa 
+mais importante que é auxiliar meus dois filhos nesse processo lindo que é APRENDER"
 
-# Transformando os comentarios em um vetor de caracteres, 
-# excluindo as linhas que não possuem comentários.
+usuario_3 <- "Posso dizer que é uma escola que acolhe não somente ao aluno como a todos familiares. Tem uma 
+equipe maravilhosa! Só tenho a agradecer por todos esses anos de dedicação."
 
-comentario_atualizado <- comentario [-c(2:4,6,19:29),]
+usuario_4 <- "Foi a minha melhor escolha após muitas pesquisas na região. Quando fui conhecer eu tive a confirmação de que seria naquele ambiente que eu queria que minha filha ficasse. A Marina integrou a família Sonho Meu aos 5 meses. Eu só tenho a agradecer todo o carinho e cuidado recebido no berçário e que se estende até hoje. Tenho total confiança no serviço prestado, profissionais altamente qualificados que fazem tudo com humanização, cuidado e muito amor. Eu só tenho a agradecer por tudo e dizer que SIM recomendo a escola. Nossos pequenos merecem o melhor e o Colégio Sonho Meu oferece além do que esperamos. 
+É muito carinho e cuidado com os pequenos e com os pais também. Obrigada"
 
-####################################################
-# TESTE COM CONTEUDO DIFERENTE DA AULA # 
+comentario <- c(usuario_1,usuario_2,usuario_3,usuario_4)
 
-getSources()
-getReaders()
+# Transformando em tibble
 
-comentarios_corpus = VCorpus(DirSource("C:/Users/CaeCi/Desktop/PROJETO EM DADOS/Text-Mining_Colegio-/Pasta com os comentarios",
-                                       encoding ="UTF-8"),readerControl = list(reader=readDOC(e)))
-
-
-
-stopwords("portuguese")
-
-comentarios_corpus = tm_map(comentarios_corpus, removeWords,stopwords("portuguese"))
-
-comentarios_corpus = tm_map(comentarios_corpus,stripWhitespace)
-
-comentarios_corpus = tm_map(comentarios_corpus, removePunctuation)
-
-comentarios_corpus = tm_map(comentarios_corpus,removeNumbers)
-
-comentarios_corpus = tm_map(comentarios_corpus, content_transformer(tolower))
-
-# Gerar a Matriz 
-
-tdm = TermDocumentMatrix(comentarios_corpus)
-
-matrix_tdm = as.matrix(tdm)
-matrix_tdm
+comentario_df <- tibble(line = 1:4,text = comentario)
 
 
+# Transformando em token
 
-###################################################################
-# Transformando em tiblle 
+df <- comentario_df %>% unnest_tokens(word,text)
 
-texto_tibble <- tibble(line = 1:14, text = comentario_atualizado)
+# Pre - processamento
 
-## Base Teste - para testar 
-teste_primeiras_linhas <- comentario_atualizado [1:5,]
+# Removendo os Stopwords
 
+df <- df %>% anti_join(get_stopwords(language = 'pt'))
 
-tok <- tokens(comentario_atualizado)
+# Contar as palavras
 
+df_count <- df %>% select(word) %>% count(word, sort = TRUE)
 
+# Criar a word cloud
 
-dim(teste_primeiras_linhas)
-
-str(comentario_atualizado)
-# transformando em tokens (quebrando em palavras)
-
-
-
-# Excluindo os números que aparecem nos comentários
-
+paleta_cores <- brewer.pal(12, "Paired")
+df_count %>% with(wordcloud(word, n,random.order = FALSE,max.words = 30,colors=paleta_cores))
 
 
